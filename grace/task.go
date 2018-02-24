@@ -1,15 +1,23 @@
 package grace
 
 import (
+	"os"
+	"strings"
 	"sync"
 	"sync/atomic"
 )
 
 var (
+	debugEnabled bool
+
 	isStopped uint32
 	wg        sync.WaitGroup
 	quit      = make(chan bool)
 )
+
+func init() {
+	debugEnabled = strings.ToLower(os.Getenv("GRACE_DEBUG")) == "true"
+}
 
 func Add() bool {
 	if atomic.LoadUint32(&isStopped) == 1 {
@@ -17,32 +25,47 @@ func Add() bool {
 	}
 
 	wg.Add(1)
-	println("grace: add")
+
+	debug("grace: add")
 
 	return true
 }
 
 func Done() {
 	wg.Done()
-	println("grace: done")
+
+	debug("grace: done")
+
 }
 
 func Stop() {
-	println("grace: stop")
+	debug("grace: stop")
+
 	atomic.StoreUint32(&isStopped, 1)
 }
 
 func Wait() {
-	println("grace: wait")
+	debug("grace: wait")
+
 	wg.Wait()
 }
 
 func Push() {
-	println("grace: push")
+	debug("grace: push")
+
 	quit <- true
 }
 
 func Pop() {
-	println("grace: pop")
+	debug("grace: pop")
+
 	<-quit
+}
+
+func debug(msg string) {
+	if !debugEnabled {
+		return
+	}
+
+	println(msg)
 }
