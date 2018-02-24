@@ -10,10 +10,12 @@ type Error struct {
 	msg   string
 	stack *Stack
 
-	causer error
+	cause error
 }
 
 func (e *Error) Error() string { return e.msg }
+
+func (e *Error) Cause() error { return e.cause }
 
 func (e *Error) Format(st fmt.State, verb rune) {
 	switch verb {
@@ -22,8 +24,8 @@ func (e *Error) Format(st fmt.State, verb rune) {
 			io.WriteString(st, e.msg)
 			e.stack.Format(st, verb)
 
-			if e.causer != nil {
-				fmt.Fprintf(st, "caused by:\n%+v\n", e.causer)
+			if e.Cause() != nil {
+				fmt.Fprintf(st, "caused by:\n%+v\n", e.Cause())
 			}
 
 			return
@@ -64,7 +66,7 @@ func Wrap(e error, format string, a ...interface{}) error {
 		return nil
 	}
 
-	err.causer = e
+	err.cause = e
 
 	return err
 }
