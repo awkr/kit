@@ -63,9 +63,7 @@ func Pop() {
 }
 
 func debug(msg string) {
-	if !debugEnabled {
-		return
+	if debugEnabled {
+		println(msg)
 	}
-
-	println(msg)
 }
