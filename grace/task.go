@@ -5,6 +5,8 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+
+	"github.com/solarwalker/kit/log"
 )
 
 var (
@@ -26,7 +28,7 @@ func Add() bool {
 
 	wg.Add(1)
 
-	debug("grace: add")
+	log.DebugFlag("grace: add", debugEnabled)
 
 	return true
 }
@@ -34,36 +36,30 @@ func Add() bool {
 func Done() {
 	wg.Done()
 
-	debug("grace: done")
+	log.DebugFlag("grace: done", debugEnabled)
 
 }
 
 func Stop() {
-	debug("grace: stop")
+	log.DebugFlag("grace: stop", debugEnabled)
 
 	atomic.StoreUint32(&isStopped, 1)
 }
 
 func Wait() {
-	debug("grace: wait")
+	log.DebugFlag("grace: wait", debugEnabled)
 
 	wg.Wait()
 }
 
 func Push() {
-	debug("grace: push")
+	log.DebugFlag("grace: push", debugEnabled)
 
 	quit <- true
 }
 
 func Pop() {
-	debug("grace: pop")
+	log.DebugFlag("grace: pop", debugEnabled)
 
 	<-quit
-}
-
-func debug(msg string) {
-	if debugEnabled {
-		println(msg)
-	}
 }
